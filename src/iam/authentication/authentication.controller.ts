@@ -35,8 +35,6 @@ export class AuthenticationController {
       sameSite: true,
     });
 
-    return {
-      accessToken,
-    };
+    return accessToken;
   }
 }
