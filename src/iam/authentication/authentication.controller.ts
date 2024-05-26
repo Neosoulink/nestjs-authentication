@@ -13,6 +13,7 @@ import { AuthType } from './enums/auth-type.enum';
 import { AuthenticationService } from './authentication.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Auth(AuthType.none)
 @Controller('authentication')
@@ -27,12 +28,29 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
   async signIn(
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) res: Response,
     @Body() signInDto: SignInDto,
   ) {
     const accessToken = await this.authService.signIn(signInDto);
 
-    response.cookie('accessToken', accessToken, {
+    res.cookie('accessToken', accessToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
+    });
+
+    return accessToken;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh-token')
+  async refresh(
+    @Res({ passthrough: true }) res: Response,
+    @Body() refreshToken: RefreshTokenDto,
+  ) {
+    const accessToken = await this.authService.refreshTokens(refreshToken);
+
+    res.cookie('accessToken', accessToken, {
       secure: true,
       httpOnly: true,
       sameSite: true,
