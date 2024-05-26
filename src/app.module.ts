@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
@@ -25,6 +26,19 @@ import { IamModule } from './iam/iam.module';
     IamModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        transform: true,
+        forbidNonWhitelisted: true,
+        forbidUnknownValues: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      }),
+    },
+  ],
 })
 export class AppModule {}
