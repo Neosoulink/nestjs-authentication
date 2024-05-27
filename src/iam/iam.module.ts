@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 
 import jwtConfig from '../config/jwt.config';
+import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.storage';
 import { User } from '../users/entities/user.entity';
 import { AuthenticationService } from './authentication/authentication.service';
 import { HashingService } from './hashing/hashing.service';
@@ -13,7 +14,7 @@ import { AuthenticationController } from './authentication/authentication.contro
 import { AccessTokenGuard } from './authentication/guard/access-token/access-token.guard';
 import { AuthenticationGuard } from './authentication/guard/authentication/authentication.guard';
 import { RolesGuard } from './authorization/guards/roles/roles.guard';
-import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.storage';
+import { PermissionsGuard } from './authorization/guards/permissions/permissions.guard';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.stora
     { provide: HashingService, useClass: BcryptService },
     { provide: APP_GUARD, useClass: AuthenticationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_GUARD, useClass: PermissionsGuard },
     AccessTokenGuard,
     RefreshTokenIdsStorage,
     AuthenticationService,
