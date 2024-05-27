@@ -12,6 +12,7 @@ import { BcryptService } from './hashing/bcrypt.service';
 import { AuthenticationController } from './authentication/authentication.controller';
 import { AccessTokenGuard } from './authentication/guard/access-token/access-token.guard';
 import { AuthenticationGuard } from './authentication/guard/authentication/authentication.guard';
+import { RolesGuard } from './authorization/guards/roles/roles.guard';
 import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.storage';
 
 @Module({
@@ -23,6 +24,7 @@ import { RefreshTokenIdsStorage } from './authentication/refresh-token-ids.stora
   providers: [
     { provide: HashingService, useClass: BcryptService },
     { provide: APP_GUARD, useClass: AuthenticationGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
     AccessTokenGuard,
     RefreshTokenIdsStorage,
     AuthenticationService,

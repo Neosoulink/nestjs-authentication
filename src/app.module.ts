@@ -35,7 +35,6 @@ import { IamModule } from './iam/iam.module';
       useValue: new ValidationPipe({
         transform: true,
         forbidNonWhitelisted: true,
-        forbidUnknownValues: true,
         transformOptions: {
           enableImplicitConversion: true,
         },
