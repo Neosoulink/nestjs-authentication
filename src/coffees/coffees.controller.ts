@@ -9,14 +9,16 @@ import {
 } from '@nestjs/common';
 
 import { Role } from '../users/enums/role.enum';
-import { ActiveUserData } from 'src/iam/interfaces/active-user-data.interface';
-import { ActiveUser } from 'src/iam/decorators/active-user.decorator';
+import { ActiveUserData } from '../iam/interfaces/active-user-data.interface';
+import { ActiveUser } from '../iam/decorators/active-user.decorator';
 import { Roles } from '../iam/authorization/decorators/role.decorator';
 import { Permissions } from '../iam/authorization/decorators/permission.decorator';
+import { Policies } from '../iam/authorization/decorators/policies.decorator';
 import { CoffeesService } from './coffees.service';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { UpdateCoffeeDto } from './dto/update-coffee.dto';
-import { Permission } from 'src/iam/authorization/permission.type';
+import { Permission } from '../iam/authorization/permission.type';
+import { FrameworkContributorPolicy } from 'src/iam/authorization/policies/framework-contributor.policy';
 
 @Controller('coffees')
 export class CoffeesController {
@@ -24,6 +26,9 @@ export class CoffeesController {
 
   @Roles(Role.Admin)
   @Permissions(Permission.CreateCoffee)
+  @Policies(
+    new FrameworkContributorPolicy() /** MinAgePolicy(18), new OnlyAdminPolicy() */,
+  )
   @Post()
   create(@Body() createCoffeeDto: CreateCoffeeDto) {
     return this.coffeesService.create(createCoffeeDto);
@@ -43,6 +48,7 @@ export class CoffeesController {
 
   @Roles(Role.Admin)
   @Permissions(Permission.UpdateCoffee)
+  @Policies(new FrameworkContributorPolicy())
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCoffeeDto: UpdateCoffeeDto) {
     return this.coffeesService.update(+id, updateCoffeeDto);
@@ -50,6 +56,7 @@ export class CoffeesController {
 
   @Roles(Role.Admin)
   @Permissions(Permission.DeleteCoffee)
+  @Policies(new FrameworkContributorPolicy())
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.coffeesService.remove(+id);
