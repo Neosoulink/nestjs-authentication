@@ -20,8 +20,8 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @Column({ nullable: true })
+  password?: string;
 
   @Column({ enum: Role, default: Role.Regular })
   role: Role;
@@ -36,4 +36,7 @@ export class User {
   @JoinTable()
   @OneToMany(() => ApiKey, (apiKey) => apiKey.user)
   apiKeys: ApiKey[];
+
+  @Column({ nullable: true })
+  googleId?: string;
 }

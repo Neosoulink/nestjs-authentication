@@ -20,7 +20,7 @@ export class AuthenticationGuard implements CanActivate {
   > = {
     [AuthType.Bearer]: this.accessTokenGuard,
     [AuthType.ApiKey]: this.apiKeyGuard,
-    [AuthType.none]: { canActivate: () => true },
+    [AuthType.None]: { canActivate: () => true },
   };
 
   constructor(
