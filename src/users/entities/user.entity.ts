@@ -33,6 +33,12 @@ export class User {
   @Column({ enum: Permission, default: [], type: 'json' })
   permissions: PermissionType[];
 
+  @Column({ default: false })
+  isTfaEnabled: boolean;
+
+  @Column({ nullable: true })
+  tfaSecret: string;
+
   @JoinTable()
   @OneToMany(() => ApiKey, (apiKey) => apiKey.user)
   apiKeys: ApiKey[];

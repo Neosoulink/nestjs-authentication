@@ -21,6 +21,7 @@ import {
   InvalidatedRefreshedTokenError,
   RefreshTokenIdsStorage,
 } from './refresh-token-ids.storage';
+import { OptAuthenticationService } from './opt-authentication.service';
 
 @Injectable()
 export class AuthenticationService {
@@ -31,6 +32,7 @@ export class AuthenticationService {
     @Inject(JwtConfig.KEY)
     private readonly jwtConfig: ConfigType<typeof JwtConfig>,
     private readonly refreshTokenIdsStorage: RefreshTokenIdsStorage,
+    private readonly otpAuthService: OptAuthenticationService,
   ) {}
 
   async signUp(signUpDto: SignUpDto) {
@@ -63,6 +65,15 @@ export class AuthenticationService {
     );
 
     if (!isEqual) throw new UnauthorizedException('Password does not match');
+
+    if (user.isTfaEnabled) {
+      const isValid = this.otpAuthService.verifyCode(
+        signInDto.tfaCode,
+        user.tfaSecret,
+      );
+
+      if (!isValid) throw new UnauthorizedException('Invalid 2FA code');
+    }
 
     return this.generateTokens(user);
   }

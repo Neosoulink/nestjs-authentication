@@ -7,6 +7,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { toFileStream } from 'qrcode';
 
 import { Auth } from './decorators/auth.decorator';
 import { AuthType } from './enums/auth-type.enum';
@@ -14,11 +15,17 @@ import { AuthenticationService } from './authentication.service';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ActiveUser } from '../decorators/active-user.decorator';
+import { ActiveUserData } from '../interfaces/active-user-data.interface';
+import { OptAuthenticationService } from './opt-authentication.service';
 
 @Auth(AuthType.None)
 @Controller('authentication')
 export class AuthenticationController {
-  constructor(private readonly authService: AuthenticationService) {}
+  constructor(
+    private readonly authService: AuthenticationService,
+    private readonly otpAuthService: OptAuthenticationService,
+  ) {}
 
   @Post('sign-up')
   signUp(@Body() signUpDto: SignUpDto) {
@@ -57,5 +64,22 @@ export class AuthenticationController {
     });
 
     return accessToken;
+  }
+
+  @Auth(AuthType.Bearer)
+  @HttpCode(HttpStatus.OK)
+  @Post('2fa/generate')
+  async generateQrCode(
+    @ActiveUser() activeUser: ActiveUserData,
+    @Res() res: Response,
+  ) {
+    const { secret, uri } = await this.otpAuthService.generateSecret(
+      activeUser.email,
+    );
+
+    await this.otpAuthService.enableTfaForUser(activeUser.email, secret);
+
+    res.type('png');
+    return toFileStream(res, uri);
   }
 }
